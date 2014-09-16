@@ -181,3 +181,64 @@ legend(
        bty = "n",
        legend = c("data", "smooth level", "95% probability limits")
        )
+
+#
+# DLM smoothing + seasonal
+expd <- ts( 
+           read.table(
+                      "Datasets/qconsum.dat",
+                      skip = 4,
+                      colClasses = "numeric")[,1],
+           start = c(1957,1),
+           frequency = 4)
+
+expd.dlm <- dlm(
+                m0 = rep(0,4),
+                C0 = 1e8 * diag( 4 ),
+                FF = matrix( c(1,1,0,0), nr=1 ),
+                V  = 1e-3,
+                GG = bdiag( 
+                           matrix(1),
+                           matrix( c(-1,-1,-1,1,0,0,0,1,0),
+                                  nr = 3,
+                                  byrow = TRUE)),
+                W = diag( 
+                         c(771.35, 86.48, 0, 0),
+                         nr = 4)
+                )
+
+plot( expd,
+     xlab = "",
+     ylab = "Expenditures",
+     type = 'p',
+     col = "darkgrey")
+
+### Filter
+expdFilt <- dlmFilter( expd, expd.dlm )
+
+lines( dropFirst( expdFilt$m[,1] ), 
+      lty = "dotdash" )
+
+### Smooth
+expdSmooth <- dlmSmooth( expdFilt )
+
+lines( dropFirst(expdSmooth$s[,1]),
+      lty = "longdash")
+
+legend( "bottomright",
+       col = c("darkgrey", rep("black", 2)),
+       lty = c("solid", "dotdash", "longdash"),
+       pch = c(1, NA, NA),
+       bty = "n",
+       legend = c("data", "filtered", "smooth")
+       )
+
+### seasonal
+plot( dropFirst( expdSmooth$s[,3] ),
+     type = 'o',
+     xlab = "",
+     ylab = "Expenditures - Seasonal",
+     )
+abline( h = 0 )
+
+unlist( expdSmooth )
