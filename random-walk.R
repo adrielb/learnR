@@ -242,3 +242,120 @@ plot( dropFirst( expdSmooth$s[,3] ),
 abline( h = 0 )
 
 unlist( expdSmooth )
+
+#
+# DLM Forecasting
+
+a <- window( 
+            cbind(Nile, NileFilt1$f, NileFilt2$f),
+            start = 1880,
+            end = 1920)
+
+plot( a[,1],
+     type = 'p',
+     col = "darkgrey",
+     xlab = "",
+     ylab = "Level")
+
+lines( a[,2], lty = "longdash")
+lines( a[,3], lty = "dotdash")
+
+leg <- c("data",
+         paste("one-step-ahead forecast, W/V =",
+               format(c(W(mod1)/V(mod1),
+                        W(mod2)/V(mod2)))))
+
+legend( "bottomleft",
+       legend = leg,
+       col = c("darkgrey", "black", "black"),
+       lty = c("solid", "longdash", "dotdash"),
+       pch = c(1,NA,NA),
+       bty = "n")
+
+# time varying variance to model system breaks
+
+mod0 <- dlmModPoly( 
+                   order = 1,
+                   dV = 15100,
+                   dW = 1468
+                   )
+
+X <- ts( matrix(mod0$W, nc=1, nr=length(Nile)),
+        start = start(Nile))
+
+window( X, 1898, 1899 )  <- 120 * mod0$W
+
+modDam <- mod0
+modDam$X <- X
+modDam$JW <- matrix( 1, 1, 1 )
+
+damFilt <- dlmFilter( Nile, modDam )
+mod0Filt <- dlmFilter( Nile, mod0 )
+
+a <- window( 
+            cbind(Nile, mod0Filt$f, damFilt$f),
+            start = 1880,
+            end = 1920)
+
+plot( a[,1],
+     type = 'p',
+     col = 'darkgrey',
+     xlab = "",
+     ylab = "Level")
+
+lines( a[,2], lty = "longdash" )
+lines( a[,3], lty = "dotdash" )
+abline( v=1898, lty = 2 )
+
+leg <- c("data",
+         paste("one-step-ahead forecast -", 
+               c("mod0", "modDam")))
+
+legend("bottomleft",
+       legend = leg,
+       col = c("darkgrey", "black", "black"),
+       lty = c("solid", "longdash", "dotdash"),
+       pch = c(1,NA,NA),
+       bty = "n")
+
+#
+# K-steps ahead forecasting
+set.seed(1)
+expdFore <- dlmForecast( 
+                        expdFilt,
+                        nAhead = 120,
+                        sampleNew = 100,
+                        )
+
+plot(
+     window( expd, start=c(1964,1) ),
+     type = 'o',
+     xlim = c(1964, 1997),
+     ylim = c(0, 1850),
+     xlab = "",
+     ylab = "Expenditures"
+     )
+
+names( expdFore )
+
+attach( expdFore )
+
+invisible( lapply(newObs, 
+                  function(x)
+                      lines(x, 
+                            col="darkgrey",
+                            type="o",
+                            pch=4)) )
+
+lines( f,
+      type = "o",
+      lwd = 2,
+      pch = 16)
+
+abline(
+       v = mean( c(time(f)[1], 
+                   time(expd)[length(expd)]) ),
+       lty = "dashed"
+       )
+
+detach()
