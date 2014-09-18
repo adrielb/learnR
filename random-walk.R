@@ -359,3 +359,11 @@ abline(
        )
 
 detach()
+
+#
+# Model checking
+
+qqnorm(residuals( damFilt, sd=FALSE ))
+qqline(residuals( damFilt, sd=FALSE ))
+
+tsdiag( damFilt )
