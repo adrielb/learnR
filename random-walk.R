@@ -157,7 +157,7 @@ drop( dlmSvd2var( U.C[[n/2+1]], D.C[n/2+1,] ) )
 
 
 # intervals
-hwid <- qnorm( 0.25, lower = FALSE ) * sqrt( unlist( dlmSvd2var(U.S, D.S) ) )
+hwid <- qnorm( 0.025, lower = FALSE ) * sqrt( unlist( dlmSvd2var(U.S, D.S) ) )
 
 smooth <- cbind( s, as.vector(s) + hwid %o% c(-1,1) )
 
