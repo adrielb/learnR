@@ -12,8 +12,6 @@ plot( data
 
 W  <- 0.121
 V  <- 9.465
-W  <- .1
-V  <- 10
 signalToNoise  <- W / V
 model <- dlmModPoly( order = 1, dV = V, dW = W )
 filter <- dlmFilter( data, model )
@@ -63,3 +61,31 @@ plot(
 lines(data
       ,type='p')
 
+#
+# Statistical tests
+# 1) Inspect residuals graphically for large values / unexpected patterns
+# 2) Check empirical autocorrelation function (ACF)
+# 3) Normal Q-Q plot (qqnorm)
+# 4) Shapiro-Wilk test - tests standardized innovations for normality
+#    H0:  normally distributed standard innovations
+#    Kolmogorov-Smirnov test - less powerfull than S-W test
+# 5) Ljung-Box test - tests for absense of serial correlation up to lag k
+# 6) tsdiag - computes p-value of L-B test at all k 
+
+resid <- residuals( filter, sd = FALSE )
+
+plot( resid )
+
+qqnorm( resid )
+qqline( resid )
+
+tsdiag( filter )
+
+shapiro.test( resid )
+
+Box.test( resid, lag = 20, type = "Ljung")
+
+sapply( 1 : 20, function(i)
+       Box.test( resid
+                ,lag=i
+                ,type="Ljung-Box")$p.value)
