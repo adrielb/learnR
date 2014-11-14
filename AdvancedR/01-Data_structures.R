@@ -69,3 +69,36 @@ x  <-  c( F, F, T )
 as.numeric( x )
 sum( x )
 mean( x )
+
+#
+# Lists
+#   elements can be of any type
+#   constructed using list()
+x <- list( 1:3, "a", c(T,F,T), c(2.8, 1.2) )
+
+# lists are recursive vectors
+x <- list( list( list("a") ) )
+str(x)
+is.recursive(x)
+
+# c() will combine several lists into one
+x <- list( list( 1,2 ), c(3,4) )
+y <- c( list( 1, 2 ), c(3, 4) )
+str(x)
+str(y)
+typeof(y)
+is.list( y )
+
+# convert list into atomic vector
+z <- unlist( x )
+typeof(z)
+
+#
+# Exercises
+# 3. 
+c(1, FALSE)
+c("a", 1)
+c(list(1), "a")
+c( TRUE, 1L )
+
+
