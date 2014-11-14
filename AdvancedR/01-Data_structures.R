@@ -101,4 +101,45 @@ c("a", 1)
 c(list(1), "a")
 c( TRUE, 1L )
 
+# 
+# Attributes
+#   arbitrary metadata
+#   attr( x, name) - individual access
+#   attributes( x ) - all at once
+y <- 1:10
+attr( y, "my_atr" ) <- "some vec"
+attr( y, "my_atr" )
+str( attributes( y ) )
+
+# structure() adds attributes to objects
+structure( 1:10, my_attribute = "another vec" )
+
+# attributes are lost when modifying a vector
+attributes( y[1] )
+attributes( sum( y[1] ) )
+
+# Only three attributes are not lost
+#  1. names()
+#  2. dim()
+#  3. class()
+
+# Name a vector
+#  1. at creation
+#  2. at modification
+#  3. at copy
+y <- c( a = 1, 2, 3 )
+attributes( y )
+
+x <- 1:3
+names( x ) <- c( "a", "b", "c" )
+
+x <- setNames( 1:3, c("a", "b", "c") )
+
+names(y)
+names(x)
+names(z)
+
+# removes names
+unname( x )
+
 
