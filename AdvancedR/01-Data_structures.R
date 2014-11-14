@@ -142,4 +142,48 @@ names(z)
 # removes names
 unname( x )
 
+#
+# Factors
+#   stores categorical data
+#   class() of 'factor' - like an integer vector 
+#   levels() set of allowed values
+x <- factor( c("a", "b", "b", "a") )
+class(x)
+levels(x)
+
+# cant use values not in levels()
+x[2] <- "c"
+
+# cant combine factors
+c( factor( "a" ), factor( "b" ) )
+
+# can use factors that are not even in the dataset
+sex_char <- c("m", "m", "m")
+sex_factor <- factor( sex_char, levels=c("m","f") )
+table(sex_factor)
+
+# non-numeric values produce factor cols instead of NA's
+z <- read.csv( text = "value\n12\n1\n.\n9" )
+typeof(z$value)
+as.double( z$value )
+class( z$value )
+as.double( as.character( z$value ) )
+
+z <- read.csv( text = "value\n12\n1\n.\n9", na.strings = "." )
+typeof(z$value)
+class( z$value )
+z$value
+
+# use stringsAsFactors = FALSE to prevent confounding data coercions
+
+#
+# Exercises
+structure( 1:5, comment = "my attr" )
+?comment
+
+f1 <- factor( letters )
+levels( f1 ) <- rev( levels( f1 ) )
+
+f2 <- rev( factor( letters ) )
+f3 <- factor( letters, levels=rev(letters) )
 
