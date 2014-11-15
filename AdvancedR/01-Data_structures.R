@@ -247,3 +247,76 @@ is.array( x )
 x1 <- array( 1:5, c(1,1,5) )
 x2 <- array( 1:5, c(1,5,1) )
 x3 <- array( 1:5, c(5,1,1) )
+
+#
+# Data frames
+#  -a list of equal length vectors
+df <- data.frame( x = 1:3, y = c("a", "b", "c") )
+str( df )
+
+# the default behavior is to turn strings into factors
+df <- data.frame( 
+                 x = 1:3, 
+                 y = c("a", "b", "c"),
+                 stringsAsFactors = FALSE
+                 )
+str( df )
+
+typeof( df )
+class( df )
+is.data.frame( df )
+
+# combining data frames with cbind(), rbind()
+cbind( df, data.frame( z=1:3 ) )
+rbind( df, data.frame( x=10, y="z" ) )
+
+# use data.frame() to combine cols since cbind() may create a matrix instead
+# 'bad' data frame coerced to Factor types:
+bad <- data.frame( cbind( a=1:2, b=c("a", "b") ))
+str(bad)
+
+good <- data.frame( 
+                   a=1:2, 
+                   b=c("a", "b"),
+                   stringsAsFactors = FALSE
+                   )
+str(good)
+
+# Special columns
+#  a column that is a list
+df <- data.frame( x = 1:3 )
+df$y <- list( 1:2, 1:3, 1:4 )
+df
+
+# however this fails: tries to put each list item into its own column
+df <- data.frame( x = 1:3, y = list( 1:2, 1:3, 1:4 ) )
+
+# I() - inhibits coercion 
+dfI <- data.frame( 
+                  x = 1:3,
+                  y = I( list(1:2, 1:3, 1:4) )
+                  )
+str( dfI )
+dfI[2, "y"]
+
+# add a column that is a matrix or array
+dfm <- data.frame( 
+                  x = 1:3,
+                  y = I( matrix( 1:9, nrow = 3 ) )
+                  )
+str(dfm)
+dfm[2, "y"]
+
+#
+# Exercises
+attributes( df )
+
+df <- data.frame( 
+                 x = 1:3, 
+                 y = c("a", "b", "c"),
+                 stringsAsFactors = FALSE
+                 )
+as.matrix( df )
+
+df = data.frame( a=I(matrix()), y=I(list()) )
+str( df )
