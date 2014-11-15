@@ -187,3 +187,63 @@ levels( f1 ) <- rev( levels( f1 ) )
 f2 <- rev( factor( letters ) )
 f3 <- factor( letters, levels=rev(letters) )
 
+#
+# Matrices and Arrays
+#   dim() makes a vector into an array
+#   a 2D array is a matrix 
+a <- matrix( 1:6, ncol=3, nrow=2 )
+b <- array( 1:12, c(2,3,2) )
+
+# can also modify dim in place
+c <- 1:6
+dim(c) <- c(3,2)
+dim(c) <- c(2,3)
+
+# length() - nrow(), ncol() for matrices; dim() for arrays
+# names()  - rownames(), colnames()     ; dimnames()
+# c()      - cbind(), rbind()           ; abind()
+length(a)
+nrow(a)
+ncol(a)
+rownames(a)  <- c("A", "B")
+colnames(a)  <- c("a", "b", "c")
+a
+
+length(b)
+dim(b)
+dimnames(b) <- list( 
+                    c( "one", "two" ),
+                    c( "a", "b", "c" ),
+                    c( "A", "B" )
+                    )
+b
+
+is.matrix()
+is.array()
+as.matrix()
+as.array()
+
+# 1D vectors, single row matrix, single col, or single dim array
+str(1:4)
+# column vector
+str( matrix( 1:4, ncol=1 ) )
+# row vector
+str( matrix( 1:4, nrow=1 ) )
+# array vector
+str( array( 1:4, 4 ) )
+
+# lists can also have their dims set
+l <- list( 1:3, "a", TRUE, 1.0 )
+dim(l) <- c( 2, 2 )
+
+#
+# Exercises
+dim( 1:3 )
+
+x <- matrix( 1:4, nrow=2 )
+is.matrix( x )
+is.array( x )
+
+x1 <- array( 1:5, c(1,1,5) )
+x2 <- array( 1:5, c(1,5,1) )
+x3 <- array( 1:5, c(5,1,1) )
