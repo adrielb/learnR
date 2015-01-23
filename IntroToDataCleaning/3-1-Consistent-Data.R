@@ -59,8 +59,53 @@ sapply( person, is.finite )
 
 #
 # 3.1.3 Outliers
+# outliers should be detected but not necessarily removed
 
+# outlier detection with box-and-whiskers plot
+x <- c( 1:10, 20, 30)
+boxplot(x)
+boxplot.stats(x)$out
 
+boxplot.stats(x, coef=2)$out
+
+# box plots fails when data is distributed skewly
+
+# Hiridoglou and Berthelot: outliers on exponential dist
+
+# rule constraints - negative age, pregnant man, ...
+install.packages("editrules")
+library(editrules)
+
+people <- read.csv( "people.txt" )
+print(people)
+
+E <- editset( c( "age >= 0", "age <= 150" ) )
+print(E)
+
+violatedEdits( E, people )
+
+E <- editfile("./edits.txt") 
+print(E)
+
+ve <- violatedEdits( E, people )
+print(ve)
+summary( ve )
+plot(ve)
+
+# Minimize number of fields altered in edit violations
+id <- c(2, 5)
+people[id,]
+
+violatedEdits( E, people[id,])
+
+# le$adapt - minimal set of variables to adapt
+le <- localizeErrors( E, people[id, ], method="mip" )
+print(le)
+
+people[2,"status"] <- "single"
+people[5,"height"] <- 7
+people[5,"agegroup"] <- "adult"
+summary( violatedEdits(E, people[id,] ))
 
 
 
