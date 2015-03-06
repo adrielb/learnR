@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// [[Rcpp::export
+// [[Rcpp::export]]
 int fibonacci( const int x ) {
 	if (x < 2)
 		return x;
