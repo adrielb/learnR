@@ -44,11 +44,14 @@ plot(X,Y)
 # Squared exponential covariance function# {{{
 scale <- 1.0
 k <- function( x1, x2 ) {
-	1e2*exp( -0.5*(x1-x2)^2 / scale )
+	0*1e0*exp( -0.5*(x1-x2)^2 / scale ) +
+	0*1e0*exp( -0.5*(x1-x2)^2 / 10*scale ) +
+  1*1e0*x1%*%x2*exp( -0.5*(x1-x2)^2 / 1*scale ) +
+	1e0
 }
 k <- Vectorize( k )
 k(0, Xs)
-plot( Xs, k(0, Xs) )
+plot( Xs, k(1, Xs) )
 # }}}
 
 fbar <- function( xs ) {
