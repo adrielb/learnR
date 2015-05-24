@@ -235,3 +235,78 @@ per_day <- summarize( daily, flights=n() )
 per_month <- summarize( per_day, flights=sum(flights) )
 per_year <- summarize( per_month, flights=sum(flights) )
 
+
+# SQLite integration
+library(dplyr)
+install.packages('nycflights13')
+library(nycflights13)
+
+head(flights)
+
+my_db <- src_sqlite( "my_db.sqlite3", create=T)
+
+# copy_to() not suitable for large datasets
+flights_sqlite <- copy_to( my_db, flights, temporary=FALSE, indexes=list( c("year", "month", "day"), "carrier", "tailnum"))
+
+# cache flights in a standard location
+flights_sqlite <- tbl( nycflights13_sqlite(), "flights")
+
+flights_sqlite
+
+# create tbl from arbitray SQL
+tbl( my_db, sql( "SELECT * FROM flights"))
+
+# expressions translated into SQL and run on database
+select( flights_sqlite, year:day, dep_delay, arr_delay)
+
+flights_sqlite %>% select( year:day, dep_delay, arr_delay)
+
+flights_sqlite %>% filter( dep_deply>240 )
+
+flights_sqlite %>% arrange( year, month, day)
+
+flights_sqlite %>% mutate( speed = air_time / distance )
+
+flights_sqlite %>% summarise( delay = mean(dep_time))
+
+# lazyness
+# 1. never pulls data back to R unless explicitly requested
+# 2. delays doing any work then sends to DB in one step
+c1 <- filter( flights_sqlite, year==2013, month==1, day==1)
+c2 <- select( c1, year, month, day, carrier, dep_delay, air_time, distance)
+c3 <- mutate( c2, speed = distance / air_time * 60 )
+c4 <- arrange( c3, year, month, day, carrier)
+print( c4 )
+
+# to pull down results, use collect()
+collect(c4)
+
+# view the sql query that is generated
+c4$query
+
+# report the way the DB uses indexes
+explain( c4 )
+
+# force computation
+  # collect()
+  # compute()
+  # collapse()
+
+# grouping
+by_tailnum <- group_by( flights_sqlite, tailnum)
+delay <- summarise( by_tailnum,
+                   count = n(),
+                   dist = mean( distance ),
+                   delay = mean( arr_delay)
+                   )
+delay <- filter( delay, count>20, dist<2000)
+delay_local <- collect( delay )
+
+delay$query
+
+
+
+
+
+
+
