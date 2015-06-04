@@ -1,5 +1,10 @@
+install.packages( "caret" )
+
 library(ggplot2)
 library(dplyr)
+library(caret)
+library(e1071)
+library(AppliedPredictiveModeling)
 
 # Box Cox to resolve skewness# {{{
 BoxCox <- function ( x, l ) {
@@ -40,8 +45,7 @@ RSiteSearch( 'geom_point'  )
 
 install.packages( "AppliedPredictiveModeling" )
 
-library(AppliedPredictiveModeling)
-
+# load data
 data(segmentationOriginal)
 
 typeof(segmentationOriginal)
@@ -50,8 +54,8 @@ names(segmentationOriginal)
 
 nrow( segmentationOriginal)
 
+# delete columns
 segData <- segmentationOriginal %>% subset( Case == "Train" )
-
 cellID <- segData$Cell
 class <- segData$Class
 case <- segData$Case
@@ -69,7 +73,6 @@ names(segmentationOriginal)
 # Transformations
 install.packages( "e1071" )
 
-library(e1071)
 
 skewness(segData$AngleCh1)
 
@@ -88,14 +91,71 @@ head(df)
 
 qplot( x=v, y=skewValues, data=df, geom='bar', stat='identity')
 
-install.packages( "caret" )
-
-library(caret)
+# estimating boxcox transform parameter
 
 Ch1AreaTrans <- BoxCoxTrans( segData$AreaCh1 )
 
 head( segData$AreaCh1 )
 
 predict( Ch1AreaTrans, head( segData$AreaCh1 ))
+
+pcaObject <- prcomp(segData, 
+                    center = TRUE,
+                    scale. = TRUE )
+
+# Calc cummulated percentages
+percentVariance <- pcaObject$sd^2 / sum( pcaObject$sd^2 ) * 100
+
+qplot( x=seq_along(percentVariance), y= percentVariance )
+
+head( pcaObject$x[,1:4] )
+
+head( pcaObject$rotation[,1:4])
+
+# spatial sign transform
+ss <- spatialSign( segData )
+
+qplot( x=ss[,7], y=ss[,2] )
+
+# administer a series of transformations
+trans <- preProcess( segData,
+                    method = c("BoxCox", "center", "scale", "pca"))
+
+transformed <- predict( trans, segData )
+
+#
+# Filtering - near-zero variance predictors
+
+nearZeroVar( segData )
+
+# filter correlated predictors
+correlations <- cor( segData )
+dim( correlations)
+
+install.packages( "corrplot" )
+
+library(corrplot)
+
+corrplot( correlations, order="hclust")
+
+highCorr <- findCorrelation( correlations, cutoff = 0.75)
+
+filteredSegData <- segData[, -highCorr]
+
+#
+# Creating Dummy Variables
+
+raw <- read.csv("../ch2/vehicles.csv")
+
+
+
+head(carSubset)
+
+
+
+
+
+
+
 
 
