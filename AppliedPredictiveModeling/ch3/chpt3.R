@@ -144,12 +144,15 @@ filteredSegData <- segData[, -highCorr]
 
 #
 # Creating Dummy Variables
+data(cars)
+str(cars)
 
-raw <- read.csv("../ch2/vehicles.csv")
-
-
+carSubset <- cars %>% 
+  dplyr::select(Price, Mileage, Type)
 
 head(carSubset)
+
+# **cars dataset has no column 'Type' ??? **
 
 
 
